@@ -1,0 +1,25 @@
+- name: Remove default dsa/rsa/ecdsa keys
+  file:
+    path: "/etc/ssh/{{ item }}"
+    state: absent
+  notify: reload ssh
+  loop:
+    - ssh_host_dsa_key
+    - ssh_host_dsa_key.pub
+    - ssh_host_rsa_key
+    - ssh_host_rsa_key.pub
+    - ssh_host_ecdsa_key
+    - ssh_host_ecdsa_key.pub
+
+- name: Install ed25519 public key
+  copy:
+    content: "{{ sshd_hostkey_ed25519_public }}"
+    dest: /etc/ssh/ssh_host_ed25519_key.pub
+  notify: reload ssh
+
+- name: Install ed25519 private key
+  copy:
+    content: "{{ sshd_hostkey_ed25519_private }}"
+    dest: /etc/ssh/ssh_host_ed25519_key
+    mode: 0600
+  notify: reload ssh
